@@ -7,19 +7,27 @@ import { Layout } from 'antd';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Content } from './components/Content';
-import { SignIn } from './components/SignIn';
+// import { SignIn } from './components/SignIn';
 
 
 function App() {
+  // general
+  const [current, setCurrent] = useState('general');
+
+  // user and messages
   const [username, setUsername] = useState(null);
-  const [text, setText] = useState('');
   const [messages, setmessages] = useState([]);
   const [users, setUsers] = useState([]);
 
+  // handles
+  const changeChat = chat => {
+    return () => setCurrent(chat);
+  };
+
   useEffect(() => {
-    const pusher = new Pusher('8d0ada5f604f6f1ca64a', {
-      authEndpoint: 'http://localhost:8080/pusher/auth',
-      cluster: 'us2',
+    const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+      authEndpoint: `${process.env.REACT_APP_API_URL}pusher/auth`,
+      cluster: process.env.REACT_APP_PUSHER_CLUSTER,
       useTLS: true
     });
 
@@ -45,21 +53,24 @@ function App() {
       setmessages(s => [ ...s, data ]);
     });
 
-    console.log(pusher.sessionID);
+    // bind dm messages
+    // channel.bind('dm', data => {
+    //   // TODO: do something 
+    // });
     
     return () => {
       pusher.unsubscribe('presence-chat');
     }
   }, []);
 
-  const handleChange = event => {
-    event.preventDefault();
+  // const handleChange = event => {
+  //   event.preventDefault();
 
-    setText(event.target.value);
-  }
+  //   setText(event.target.value);
+  // }
 
-  const handleTosubmit = message => {
-    axios.post('http://localhost:8080/message', message);
+  const handleTosubmit = (message) => {
+    axios.post(`${process.env.REACT_APP_API_URL}messages`, message);
   }
 
   return (
@@ -72,12 +83,18 @@ function App() {
       /> */}
 
 
-      <Sidebar users={users} />
+      <Sidebar
+        current={current}
+        setCurrent={changeChat}
+        username={username}
+        users={users}
+      />
 
       <Layout className="site-layout">
-        <Header />
+        <Header current={current} />
 
         <Content
+          current={current}
           userID={username}
           messages={messages}
           handleToSubmit={handleTosubmit}

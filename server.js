@@ -1,8 +1,10 @@
-const Pusher = require('pusher');
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const uuid = require('uuid');
+const Pusher = require('pusher');
 
 const app = express();
 
@@ -11,18 +13,19 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 const pusher = new Pusher({
-  appId: '1106267',
-  key: '8d0ada5f604f6f1ca64a',
-  secret: '03ffa2e3a9a33605e75c',
-  cluster: 'us2',
+  appId: process.env.REACT_APP_PUSHER_APP_ID,
+  key: process.env.REACT_APP_PUSHER_KEY,
+  secret: process.env.REACT_APP_PUSHER_SECRET,
+  cluster: process.env.REACT_APP_PUSHER_CLUSTER,
   useTLS: true
 });
 app.set('PORT', process.env.PORT || 8080);
 
-app.post('/message', (req, res) => {
+app.post('/messages', (req, res) => {
   const payload = req.body;
 
-  pusher.trigger('presence-chat', 'message', payload);
+  if (payload.type === 'general') pusher.trigger('presence-chat', 'message', payload);
+  // if (payload.type === 'dm') // TODO: somethign
 
   res.send(payload);
 });
