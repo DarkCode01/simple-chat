@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.message-list-size {
+  padding-top: 10px;
+  min-height: 750px;
+}
