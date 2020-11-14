@@ -31,15 +31,17 @@ app.post('/messages', (req, res) => {
 });
 
 app.post('/pusher/auth', async (req, res) => {
-  const userID = uuid.v4();
+  const username = uuid.v4();
   const socketID = req.body.socket_id;
   const channel = req.body.channel_name;
   const auth = pusher.authenticate(socketID, channel, {
-    user_id: userID,
-    user_info: { }
+    user_id: socketID,
+    user_info: {
+      name: username
+    }
   });
 
-  console.log(`User ${userID} joined to chat.`);
+  console.log(`User ${username} joined to chat.`);
 
   res.send(auth);
 });

@@ -3,7 +3,7 @@ import { Layout, Menu, Typography } from 'antd';
 import { UserOutlined, GlobalOutlined } from '@ant-design/icons';
 
 export const Sidebar = ({
-  current, setCurrent, username, users
+  current, setCurrent, userId, users
 }) => (
   <Layout.Sider
     collapsible
@@ -23,12 +23,12 @@ export const Sidebar = ({
 
       { users.map(user => (
           <Menu.Item
-            key={user}
+            key={user.id}
             icon={<UserOutlined />}
-            disabled={username === user}
-            onClick={setCurrent(user)}
+            disabled={userId === user?.id}
+            onClick={setCurrent(user?.info?.name)}
           >
-            { username === user ? 'me' : user }
+            { userId === user.id ? 'me' : user?.info?.name }
           </Menu.Item>
         ))
       }

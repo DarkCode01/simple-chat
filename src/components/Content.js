@@ -3,14 +3,14 @@ import { map } from 'ramda';
 import { Layout, Row, Col, Form, Input, Select, Button } from 'antd';
 import { MessageList } from 'react-chat-elements'
 
-export const Content = ({ current, userID, messages, handleToSubmit }) => {
+export const Content = ({ current, user, messages, handleToSubmit }) => {
   const [form] = Form.useForm();
 
   // parser
   const messagesP = map(
     (m) => ({
-        title: userID === m.user_id ? 'you' : userID,
-        position: userID === m.user_id ? 'right' : 'left',
+        title: user.id === m.user_id ? 'you' : user?.info?.name,
+        position: user.id === m.user_id ? 'right' : 'left',
         type: 'text',
         text: m.message,
         date: new Date(),
@@ -41,7 +41,7 @@ export const Content = ({ current, userID, messages, handleToSubmit }) => {
                 .validateFields()
                 .then(({ message }) => {
                   form.resetFields();
-                  handleToSubmit({ type: current, user_id: userID, message: message });
+                  handleToSubmit({ type: current, user_id: user.id, message: message });
                 })
                 .catch(info => {
                   console.log(info);

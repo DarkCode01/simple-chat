@@ -3,10 +3,13 @@ import Pusher from 'pusher-js';
 import axios from 'axios';
 import { filter } from 'ramda';
 
+import { parserObject } from './utils';
+
 import { Layout } from 'antd';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Content } from './components/Content';
+import { unmountComponentAtNode } from 'react-dom';
 // import { SignIn } from './components/SignIn';
 
 
@@ -15,7 +18,7 @@ function App() {
   const [current, setCurrent] = useState('general');
 
   // user and messages
-  const [username, setUsername] = useState(null);
+  const [user, setUser] = useState({});
   const [messages, setmessages] = useState([]);
   const [users, setUsers] = useState([]);
 
@@ -35,17 +38,17 @@ function App() {
 
     // add users to list...
     channel.bind('pusher:subscription_succeeded', data => {
-      setUsername(data.myID);
-      setUsers(Object.keys(data.members));
+      setUser(data.me);
+      setUsers(parserObject(data.members));
     });
 
     channel.bind('pusher:member_added', member => {
-      setUsers(u => [ ...u, member.id ]);
+      setUsers(u => [ ...u, member ]);
     });
 
     // remove user when unsuscripbe
     channel.bind('pusher:member_removed', member => {
-      setUsers(u => filter(id => id !== member.id, u));
+      setUsers(u => filter(uu => uu.id !== member.id, u));
     });
 
     // bind messages
@@ -82,11 +85,10 @@ function App() {
         onCreate={newUsername => setUsername(newUsername)}
       /> */}
 
-
       <Sidebar
         current={current}
         setCurrent={changeChat}
-        username={username}
+        userId={user.id}
         users={users}
       />
 
@@ -95,7 +97,7 @@ function App() {
 
         <Content
           current={current}
-          userID={username}
+          user={user}
           messages={messages}
           handleToSubmit={handleTosubmit}
         />
